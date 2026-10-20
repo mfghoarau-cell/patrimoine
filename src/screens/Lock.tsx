@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Icon } from '../ui';
 
 /** Pavé de code à 4 chiffres, utilisé pour déverrouiller et pour créer le code. */
-export const PinPad = ({ title, subtitle, error, onComplete }: { title: string; subtitle?: string; error?: string; onComplete: (pin: string) => void }) => {
+export const PinPad = ({ title, subtitle, hint, error, onComplete }: { title: string; subtitle?: string; hint?: string; error?: string; onComplete: (pin: string) => void }) => {
   const [pin, setPin] = useState('');
   const press = (k: string) => {
     if (k === 'del') return setPin((p) => p.slice(0, -1));
@@ -23,6 +23,7 @@ export const PinPad = ({ title, subtitle, error, onComplete }: { title: string; 
       </div>
       <h2>{title}</h2>
       {subtitle && <p className="small muted center">{subtitle}</p>}
+      {hint && <p className="pin-hint">{hint}</p>}
       <div className="dots" aria-label={`${pin.length} chiffre(s) saisi(s) sur 4`}>
         {[0, 1, 2, 3].map((i) => (
           <span key={i} className={i < pin.length ? 'on' : ''} />

@@ -57,6 +57,8 @@ Sur l'écran d'accueil de l'application, « Découvrir avec des données d'exemp
 
 Pour repartir de zéro : *Réglages > Quitter la démo*.
 
+Lien direct pour une démonstration : `https://<ton-compte>.github.io/patrimoine/#demo` ouvre l'écran du code avec les données d'exemple et affiche le code 1234. Sur un appareil qui contient déjà de vraies données, la démo reste en mémoire et rien n'est enregistré.
+
 ## Écrans pour Figma
 
 Chaque écran s'ouvre directement, avec les données d'exemple et sans rien enregistrer, en ajoutant son nom à l'adresse de l'application : `#ecran-bienvenue`, `#ecran-code`, `#ecran-accueil`, `#ecran-saisie`, `#ecran-mouvements`, `#ecran-point-1` à `#ecran-point-4`, `#ecran-point-fin`, `#ecran-objectifs`, `#ecran-objectif`, `#ecran-patrimoine`, `#ecran-reglages`.

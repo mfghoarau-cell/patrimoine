@@ -46,8 +46,21 @@ const vitrineScreen = (v: VitrineScreen, d: AppData, today: Date): Screen => {
 
 export default function App() {
   const [vitrine] = useState(() => vitrineFromHash(location.hash));
-  const [data, setData] = useState<AppData>(() => (vitrine ? (vitrine === 'bienvenue' ? emptyData() : buildDemo(new Date(), 'vitrine')) : loadData()));
-  const [locked, setLocked] = useState(() => (vitrine ? vitrine === 'code' : !!data.settings.pinHash));
+  // Lien de démonstration (#demo) : ouvre l'écran du code avec les données d'exemple.
+  // Si l'appareil contient déjà de vraies données, la démo reste en mémoire et rien n'est enregistré.
+  const [demoLink] = useState(() => !vitrine && location.hash === '#demo');
+  const [ephemeral] = useState(() => {
+    if (!demoLink) return false;
+    const stored = loadData();
+    return stored.settings.setupDone && !stored.settings.demo;
+  });
+  const [data, setData] = useState<AppData>(() => {
+    if (vitrine) return vitrine === 'bienvenue' ? emptyData() : buildDemo(new Date(), 'vitrine');
+    const stored = loadData();
+    if (demoLink && !(stored.settings.setupDone && stored.settings.demo)) return buildDemo(new Date(), 'demo');
+    return stored;
+  });
+  const [locked, setLocked] = useState(() => (vitrine ? vitrine === 'code' : demoLink || !!data.settings.pinHash));
   const [pinError, setPinError] = useState<string>();
   const [screen, setScreen] = useState<Screen>(() => (vitrine ? vitrineScreen(vitrine, data, new Date()) : { name: 'home' }));
   const [entrySheet, setEntrySheet] = useState<{ entry?: Entry } | null>(() => (vitrine === 'saisie' ? {} : null));
@@ -58,8 +71,8 @@ export default function App() {
   const toastTimer = useRef<number>();
 
   useEffect(() => {
-    if (!vitrine) setSaveFailed(!saveData(data));
-  }, [data, vitrine]);
+    if (!vitrine && !ephemeral) setSaveFailed(!saveData(data));
+  }, [data, vitrine, ephemeral]);
 
   useEffect(() => {
     if (!vitrine) return;
@@ -125,10 +138,10 @@ export default function App() {
       <div className="app">
         <PinPad
           title="Entre ton code"
-          subtitle={data.settings.demo ? `Données d'exemple : code ${DEMO_PIN}` : undefined}
+          hint={data.settings.demo ? `Code de l'exemple : ${DEMO_PIN}` : undefined}
           error={pinError}
           onComplete={async (pin) => {
-            if ((await hashPin(pin)) === data.settings.pinHash) {
+            if ((data.settings.demo && pin === DEMO_PIN) || (await hashPin(pin)) === data.settings.pinHash) {
               setPinError(undefined);
               setLocked(false);
               setToday(new Date());

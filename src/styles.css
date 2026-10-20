@@ -206,6 +206,7 @@ details.breakdown[open] summary svg { transform: rotate(90deg); }
 .dots span { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ink); }
 .dots span.on { background: var(--ink); }
 .pin-error { min-height: 1.3em; color: var(--bad); font-size: 0.9rem; }
+.pin-hint { margin: 0; color: var(--bad); font-weight: 800; font-size: 1.05rem; text-align: center; }
 .keypad { display: grid; grid-template-columns: repeat(3, 76px); gap: 12px 22px; }
 .keypad button { height: 64px; border-radius: 50%; font-size: 1.5rem; font-weight: 500; display: grid; place-items: center; }
 .keypad button:active { background: var(--paper); }
