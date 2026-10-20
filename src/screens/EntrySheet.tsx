@@ -18,12 +18,12 @@ const IMPORT_CHOICES: [Kind, string][] = [
 ];
 
 /** Saisie express d'une dépense, ou modification d'une opération existante. */
-export const EntrySheet = ({ entry, onClose }: { entry?: Entry; onClose: () => void }) => {
+export const EntrySheet = ({ entry, onClose, initialAmount, initialCat }: { entry?: Entry; onClose: () => void; initialAmount?: string; initialCat?: string }) => {
   const { data, today, update, toast } = useStore();
   const editing = !!entry;
-  const [amount, setAmount] = useState(entry ? entry.amount.toFixed(2).replace('.', ',').replace(/,00$/, '') : '');
+  const [amount, setAmount] = useState(entry ? entry.amount.toFixed(2).replace('.', ',').replace(/,00$/, '') : initialAmount ?? '');
   const [kind, setKind] = useState<Kind>(entry?.kind ?? 'leisure');
-  const [cat, setCat] = useState(entry?.cat ?? data.cats[0]?.id ?? 'autre');
+  const [cat, setCat] = useState(entry?.cat ?? initialCat ?? data.cats[0]?.id ?? 'autre');
   const [label, setLabel] = useState(entry?.label ?? '');
   const [date, setDate] = useState(entry?.date ?? isoDay(today));
   const favorites = editing ? [] : learnedFavorites(data.entries, today);

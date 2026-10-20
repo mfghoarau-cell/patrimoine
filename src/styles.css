@@ -210,17 +210,20 @@ details.breakdown[open] summary svg { transform: rotate(90deg); }
 .keypad button { height: 64px; border-radius: 50%; font-size: 1.5rem; font-weight: 500; display: grid; place-items: center; }
 .keypad button:active { background: var(--paper); }
 .keypad.wide { grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
-.keypad.wide button { border-radius: 12px; height: 52px; font-size: 1.35rem; background: var(--paper); }
+.keypad.wide button { border-radius: 12px; height: 46px; font-size: 1.3rem; background: var(--paper); }
 .overlay { position: absolute; inset: 0; background: var(--surface); z-index: 40; display: flex; flex-direction: column; }
 .overlay-close { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); }
 
 /* ---------- feuille ---------- */
 .scrim { position: absolute; inset: 0; background: var(--scrim); z-index: 20; display: flex; align-items: flex-end; }
-.sheet { background: var(--surface); width: 100%; border-radius: 22px 22px 0 0; padding-top: 10px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; max-height: 94%; overflow-y: auto; animation: up 0.22s ease-out; }
+.sheet { background: var(--surface); width: 100%; border-radius: 22px 22px 0 0; padding-top: 8px; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; max-height: 94%; overflow-y: auto; animation: up 0.22s ease-out; }
 .sheet .row { align-items: center; }
+.sheet .chips { gap: 6px; }
+.sheet .chip { min-height: 38px; }
+.sheet .field input { min-height: 44px; }
 @keyframes up { from { transform: translateY(30px); opacity: 0.6; } to { transform: none; opacity: 1; } }
 .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); align-self: center; }
-.amount-display { text-align: center; font-size: 2.8rem; font-weight: 800; letter-spacing: -0.02em; min-height: 3.4rem; }
+.amount-display { text-align: center; font-size: 2.5rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
 .amount-display .cur { color: var(--ink-2); font-weight: 500; }
 .impact { font-size: 0.9rem; color: var(--ink-2); text-align: center; }
 .raw { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; font-size: 0.82rem; color: var(--ink-2); overflow-wrap: anywhere; }

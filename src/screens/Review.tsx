@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ClosedRecurring, Entry, Kind, MonthClose, Rule } from '../types';
 import { useStore } from '../store';
 import { applyClose, closedRecurringDraft, goalState, monthResult } from '../lib/budget';
@@ -20,9 +20,10 @@ const CREDIT_CHOICES: [Kind, string][] = [
 ];
 
 /** Le point du mois : confirmer, ranger, faire le bilan, répartir. Rien n'est enregistré avant la dernière étape. */
-export const Review = ({ month }: { month: string }) => {
+export const Review = ({ month, vitrine }: { month: string; vitrine?: string }) => {
   const { data, today, update, go } = useStore();
-  const [step, setStep] = useState(1);
+  const vitrineStep = vitrine ? Number(vitrine.split('-')[1]) || 4 : 1;
+  const [step, setStep] = useState(vitrineStep);
   const [recurring, setRecurring] = useState<ClosedRecurring[]>(() => closedRecurringDraft(data.recurring));
   const [editing, setEditing] = useState<string | null>(null);
   const [lines, setLines] = useState<ImportLine[] | null>(null);
@@ -55,12 +56,21 @@ export const Review = ({ month }: { month: string }) => {
   const allocated = goals.reduce((s, g) => s + allocOf(g.id), 0);
   const pea = total - allocated;
 
-  const onText = (text: string) => {
+  const onText = (text: string, presort = false) => {
     const parsed = parseBankCsv(text);
     setImportErrors(parsed.errors);
     const classified = classifyImport(parsed.rows, month, recurring, data.entries, data.rules);
     setLines(classified);
-    setChoices({});
+    // Mode vitrine : opérations déjà rangées, pour montrer les étapes suivantes.
+    setChoices(
+      presort
+        ? Object.fromEntries(
+            classified
+              .filter((l) => l.status === 'todo')
+              .map((l) => [l.id, /decathlon/i.test(l.raw) ? { kind: 'life' as Kind } : { kind: 'leisure' as Kind, cat: /fnac/i.test(l.raw) ? 'culture' : 'sorties' }]),
+          )
+        : {},
+    );
     // Le relevé fait foi : on reprend le montant réellement prélevé ou versé.
     setRecurring((rec) =>
       rec.map((r) => {
@@ -69,6 +79,11 @@ export const Review = ({ month }: { month: string }) => {
       }),
     );
   };
+
+  useEffect(() => {
+    if (vitrine && vitrineStep >= 2) onText(demoCsv(month), true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const finish = () => {
     const newRules: Rule[] = todo
@@ -88,6 +103,11 @@ export const Review = ({ month }: { month: string }) => {
     update((d) => applyClose({ ...d, entries: [...d.entries, ...pendingEntries], rules: [...d.rules, ...newRules] }, close));
     setDone(close);
   };
+
+  useEffect(() => {
+    if (vitrine === 'point-fin' && lines && !done) finish();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lines]);
 
   if (done)
     return (

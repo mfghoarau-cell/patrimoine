@@ -57,6 +57,12 @@ Sur l'écran d'accueil de l'application, « Découvrir avec des données d'exemp
 
 Pour repartir de zéro : *Réglages > Quitter la démo*.
 
+## Écrans pour Figma
+
+Chaque écran s'ouvre directement, avec les données d'exemple et sans rien enregistrer, en ajoutant son nom à l'adresse de l'application : `#ecran-bienvenue`, `#ecran-code`, `#ecran-accueil`, `#ecran-saisie`, `#ecran-mouvements`, `#ecran-point-1` à `#ecran-point-4`, `#ecran-point-fin`, `#ecran-objectifs`, `#ecran-objectif`, `#ecran-patrimoine`, `#ecran-reglages`.
+
+Pour les importer en calques modifiables dans Figma : plugin html.to.design, onglet URL, colle par exemple `https://mfghoarau-cell.github.io/patrimoine/#ecran-accueil`, choisis une largeur de 390 px, puis importe.
+
 ## Sauvegarde
 
 Les données ne vivent que sur le téléphone. Dans *Réglages > Sauvegarde*, exporte une sauvegarde chaque mois, par exemple juste après le point du mois, et range-la dans ton cloud (iCloud Drive, Google Drive). Le même écran permet de la restaurer sur un nouveau téléphone.

@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AppData, Entry } from './types';
 import { StoreContext, type Screen, type Store, type Tab } from './store';
-import { askPersistence, loadData, saveData } from './lib/storage';
+import { askPersistence, emptyData, loadData, saveData } from './lib/storage';
+import { buildDemo } from './lib/demo';
+import { pendingReviewMonth } from './lib/budget';
+import { vitrineFromHash, type VitrineScreen } from './lib/vitrine';
 import { hashPin } from './lib/pin';
 import { DEMO_PIN } from './lib/demo';
 import { Icon } from './ui';
@@ -31,12 +34,23 @@ const tabOf = (s: Screen): Tab | null => {
   return null;
 };
 
+const vitrineScreen = (v: VitrineScreen, d: AppData, today: Date): Screen => {
+  if (v === 'mouvements') return { name: 'moves' };
+  if (v === 'objectifs') return { name: 'goals' };
+  if (v === 'objectif') return { name: 'goal', id: 'japon' };
+  if (v === 'patrimoine') return { name: 'patrimoine' };
+  if (v === 'reglages') return { name: 'settings' };
+  if (v.startsWith('point')) return { name: 'review', month: pendingReviewMonth(d, today) ?? '' };
+  return { name: 'home' };
+};
+
 export default function App() {
-  const [data, setData] = useState<AppData>(loadData);
-  const [locked, setLocked] = useState(() => !!data.settings.pinHash);
+  const [vitrine] = useState(() => vitrineFromHash(location.hash));
+  const [data, setData] = useState<AppData>(() => (vitrine ? (vitrine === 'bienvenue' ? emptyData() : buildDemo(new Date(), 'vitrine')) : loadData()));
+  const [locked, setLocked] = useState(() => (vitrine ? vitrine === 'code' : !!data.settings.pinHash));
   const [pinError, setPinError] = useState<string>();
-  const [screen, setScreen] = useState<Screen>({ name: 'home' });
-  const [entrySheet, setEntrySheet] = useState<{ entry?: Entry } | null>(null);
+  const [screen, setScreen] = useState<Screen>(() => (vitrine ? vitrineScreen(vitrine, data, new Date()) : { name: 'home' }));
+  const [entrySheet, setEntrySheet] = useState<{ entry?: Entry } | null>(() => (vitrine === 'saisie' ? {} : null));
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [today, setToday] = useState(() => new Date());
   const [saveFailed, setSaveFailed] = useState(false);
@@ -44,8 +58,15 @@ export default function App() {
   const toastTimer = useRef<number>();
 
   useEffect(() => {
-    setSaveFailed(!saveData(data));
-  }, [data]);
+    if (!vitrine) setSaveFailed(!saveData(data));
+  }, [data, vitrine]);
+
+  useEffect(() => {
+    if (!vitrine) return;
+    const onHash = () => location.reload();
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, [vitrine]);
 
   useEffect(() => {
     void askPersistence();
@@ -148,7 +169,7 @@ export default function App() {
       body = <RulesSettings />;
       break;
     case 'review':
-      body = <Review key={screen.month} month={screen.month} />;
+      body = <Review key={screen.month} month={screen.month} vitrine={vitrine?.startsWith('point') ? vitrine : undefined} />;
       break;
   }
 
@@ -183,7 +204,7 @@ export default function App() {
             ))}
           </nav>
         )}
-        {entrySheet && <EntrySheet entry={entrySheet.entry} onClose={() => setEntrySheet(null)} />}
+        {entrySheet && <EntrySheet entry={entrySheet.entry} initialAmount={vitrine === 'saisie' ? '12,50' : undefined} initialCat={vitrine === 'saisie' ? 'culture' : undefined} onClose={() => setEntrySheet(null)} />}
         {toastMsg && (
           <div className="toast" role="status">
             {toastMsg}
